@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateTaskDto } from './dto/create.task.dto';
+import { UpdateTaskDto } from './dto/update.task.dto';
 import { TaskMapper } from './task.mapper';
 
 @ApiTags('tasks')
@@ -22,16 +22,6 @@ export class TasksController {
     private readonly tasksService: TasksService,
     private readonly taskMapper: TaskMapper,
   ) {}
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new task' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'The task has been successfully created.',
-  })
-  async create(@Body() createTaskDto: CreateTaskDto) {
-    await this.tasksService.create(createTaskDto);
-  }
 
   @Get()
   @ApiOperation({ summary: 'Get all tasks' })
@@ -58,6 +48,16 @@ export class TasksController {
   async findOne(@Param('id') id: string) {
     const task = await this.tasksService.findOne(id);
     return this.taskMapper.toDto(task);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new task' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'The task has been successfully created.',
+  })
+  async create(@Body() createTaskDto: CreateTaskDto) {
+    await this.tasksService.create(createTaskDto);
   }
 
   @Patch(':id')

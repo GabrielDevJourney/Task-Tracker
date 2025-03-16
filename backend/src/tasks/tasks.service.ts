@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './schemas/task.schema';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateTaskDto } from './dto/create.task.dto';
+import { UpdateTaskDto } from './dto/update.task.dto';
 import { TaskMapper } from './task.mapper';
 import { TaskRepository } from './tasks.repository';
 
@@ -11,11 +11,6 @@ export class TasksService {
     private taskMapper: TaskMapper,
     private taskRepository: TaskRepository,
   ) {}
-
-  async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const taskData = this.taskMapper.toEntity(createTaskDto);
-    return this.taskRepository.create(taskData);
-  }
 
   async findAll(): Promise<Task[]> {
     return this.taskRepository.findAll();
@@ -27,6 +22,10 @@ export class TasksService {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
     return task;
+  }
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const taskData = this.taskMapper.toEntity(createTaskDto);
+    return this.taskRepository.create(taskData);
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {

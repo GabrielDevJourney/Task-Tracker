@@ -7,17 +7,16 @@ import { Task, TaskDocument } from './schemas/task.schema';
 export class TaskRepository {
   constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
 
-  async create(taskData: Partial<Task>): Promise<Task> {
-    const createdTask = new this.taskModel(taskData);
-    return createdTask.save();
-  }
-
   async findAll(): Promise<Task[]> {
     return this.taskModel.find().exec();
   }
-
   async findById(id: string): Promise<Task | null> {
     return this.taskModel.findById(id).exec();
+  }
+
+  async create(taskData: Partial<Task>): Promise<Task> {
+    const createdTask = new this.taskModel(taskData);
+    return createdTask.save();
   }
 
   async update(id: string, updateData: Partial<Task>): Promise<Task | null> {
