@@ -35,4 +35,4 @@ services:
 
 networks:
   app-network:
-    driver: bridgee
+    driver: bridge
