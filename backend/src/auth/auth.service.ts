@@ -1,13 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from 'src/users/schemas/user.schema';
 import { RegisterUserDto } from './dto/register.dto';
 import { LoginUserDto } from './dto/login.dto';
-import { UserMapper } from 'src/users/user.mapper';
+import { AuthMapper } from './auth.mapper';
 import { AuthRepository } from './auth.repository';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private userMapper: UserMapper,
+    private authMapper: AuthMapper,
     private authRepository: AuthRepository,
   ) {}
   async findByEmail(email: string): Promise<User | null> {
@@ -15,20 +20,25 @@ export class AuthService {
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<User> {
-    const userData = this.userMapper.toEntity(registerUserDto);
+    const userData = this.authMapper.toEntity(registerUserDto);
     return this.authRepository.register(userData);
   }
-  async login(userData: Partial<User>): Promise<User> {
-    if (!userData.email) {
-      throw new NotFoundException('Email is required');
-    }
-
-    const user = await this.findByEmail(userData.email);
+  async login(loginUserDto: LoginUserDto): Promise<User> {
+    const user = await this.authRepository.findByEmail(loginUserDto.email);
 
     if (!user) {
-      throw new NotFoundException('User  not found');
+      throw new NotFoundException('User not found');
     }
-    // Here you would typically check the password as well
+
+    const isPasswordValid = await bcrypt.compare(
+      loginUserDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     return user;
   }
 }
