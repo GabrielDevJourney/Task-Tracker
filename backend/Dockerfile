@@ -1,4 +1,5 @@
-FROM node:18
+#apine usage to reduce size of container since no large needed
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 

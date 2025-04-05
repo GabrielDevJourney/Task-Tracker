@@ -8,12 +8,14 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create.task.dto';
 import { UpdateTaskDto } from './dto/update.task.dto';
 import { TaskMapper } from './task.mapper';
+import { PaginationDto } from './dto/pagination.task.dto';
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -29,8 +31,8 @@ export class TasksController {
     status: HttpStatus.OK,
     description: 'Returns all tasks.',
   })
-  async findAll() {
-    const tasks = await this.tasksService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    const tasks = await this.tasksService.findAll(paginationDto);
     return tasks.map((task) => this.taskMapper.toDto(task));
   }
 
@@ -57,7 +59,8 @@ export class TasksController {
     description: 'The task has been successfully created.',
   })
   async create(@Body() createTaskDto: CreateTaskDto) {
-    await this.tasksService.create(createTaskDto);
+    const task = await this.tasksService.create(createTaskDto);
+    return this.taskMapper.toDto(task);
   }
 
   @Patch(':id')

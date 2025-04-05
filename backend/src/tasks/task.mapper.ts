@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Task } from './schemas/task.schema';
+import { Task, TaskDocument } from './schemas/task.schema';
+import { TaskDto } from './dto/task.dto';
 import { CreateTaskDto } from './dto/create.task.dto';
 import { UpdateTaskDto } from './dto/update.task.dto';
 
@@ -36,8 +37,9 @@ export class TaskMapper {
     return updatedTask;
   }
 
-  toDto(task: Task) {
+  toDto(task: TaskDocument): TaskDto {
     return {
+      _id: task._id.toString(),
       title: task.title,
       description: task.description,
       completed: task.completed,

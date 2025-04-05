@@ -1,3 +1,6 @@
+#General project
+.env
+
 # Build output
 dist/
 build/

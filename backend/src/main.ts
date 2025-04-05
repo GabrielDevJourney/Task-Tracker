@@ -3,11 +3,14 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { CustomResponseInterceptor } from './common/interceptors/CustomResponseInterceptor';
 import * as fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Custom interceptor for http response and request stadardize formatting
+  app.useGlobalInterceptors(new CustomResponseInterceptor());
   // Enable CORS
   app.enableCors();
 
