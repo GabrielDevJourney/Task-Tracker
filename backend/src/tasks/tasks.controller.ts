@@ -32,8 +32,7 @@ export class TasksController {
     description: 'Returns all tasks.',
   })
   async findAll(@Query() paginationDto: PaginationDto) {
-    const tasks = await this.tasksService.findAll(paginationDto);
-    return tasks.map((task) => this.taskMapper.toDto(task));
+    return this.tasksService.findAll(paginationDto);
   }
 
   @Get(':id')

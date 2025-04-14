@@ -7,13 +7,13 @@ export class PaginationDto {
   @IsOptional()
   @Type(() => Number)
   @IsPositive()
-  limit?: number;
+  limit?: number = 10;
 
   @ApiPropertyOptional({ default: 0, description: 'Number of items to skip' })
   @IsOptional()
   @Type(() => Number)
   @Min(0)
-  offset?: number;
+  offset?: number = 0;
 
   @ApiPropertyOptional({
     default: 'createdAt',

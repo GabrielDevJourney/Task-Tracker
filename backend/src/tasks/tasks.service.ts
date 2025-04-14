@@ -3,17 +3,13 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Task, TaskDocument } from './schemas/task.schema';
+import { TaskDocument } from './schemas/task.schema';
 import { CreateTaskDto } from './dto/create.task.dto';
 import { UpdateTaskDto } from './dto/update.task.dto';
 import { TaskMapper } from './task.mapper';
 import { TaskRepository } from './tasks.repository';
 import { PaginationDto } from './dto/pagination.task.dto';
 
-interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-}
 @Injectable()
 export class TasksService {
   constructor(
@@ -21,15 +17,19 @@ export class TasksService {
     private taskRepository: TaskRepository,
   ) {}
 
-  async findAll(
-    paginationDto: PaginationDto,
-  ): Promise<PaginatedResponse<TaskDocument>> {
-    const { limit = 10, offset = 0 } = paginationDto;
+  async findAll(paginationDto: PaginationDto) {
+    // Get data from repository
     const [items, total] = await Promise.all([
-      this.taskRepository.findAll(limit, offset),
-      this.taskRepository.count(),
+      this.taskRepository.findAll(paginationDto),
+      this.taskRepository.count(paginationDto),
     ]);
-    return { items, total };
+
+    return {
+      items: items.map((task) => this.taskMapper.toDto(task)),
+      total,
+      page: Math.ceil(paginationDto.offset ?? 0) + 1,
+      pageSize: paginationDto.limit ?? 10,
+    };
   }
 
   async findOne(id: string): Promise<TaskDocument> {
