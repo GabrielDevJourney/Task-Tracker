@@ -1,0 +1,25 @@
+#General project
+.env
+
+# Build output
+dist/
+build/
+
+# Coverage reports
+coverage/
+
+# NestJS specific
+.nest/
+
+# MongoDB local data
+data/db/
+
+# Generated migration files
+migrations/
+
+# Test outputs
+.nyc_output/
+junit/
+
+# Swagger generated docs (if not captured in root)
+swagger-*.json

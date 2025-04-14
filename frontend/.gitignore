@@ -1,0 +1,13 @@
+# Build files
+dist
+dist-ssr
+
+# Local env files
+*.local
+
+# Specific logs not covered by root
+lerna-debug.log*
+pnpm-debug.log*
+
+# Vite specific
+.vite/
