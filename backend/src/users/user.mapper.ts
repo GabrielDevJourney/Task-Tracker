@@ -3,6 +3,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UpdateUserDto } from './dto/update.user.dto';
+import { UserLoginResponseDto } from './dto/user.login.response';
 
 @Injectable()
 export class UserMapper {
@@ -13,26 +14,6 @@ export class UserMapper {
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
       role: createUserDto.role,
-    };
-  }
-
-  toDto(user: UserDocument): UserDto {
-    return {
-      _id: user._id.toString(),
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-    };
-  }
-
-  toResponseDto(user: UserDocument): UserDto {
-    return {
-      _id: user._id.toString(),
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
     };
   }
 
@@ -55,5 +36,32 @@ export class UserMapper {
     }
 
     return updatedUser;
+  }
+
+  toDto(user: UserDocument): UserDto {
+    return {
+      _id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
+  }
+
+  toResponseDto(user: UserDocument): UserDto {
+    return {
+      _id: user._id.toString(),
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
+  }
+
+  toLoginResponseDto(user: UserDocument, token: string): UserLoginResponseDto {
+    return {
+      email: user.email,
+      token: token,
+    };
   }
 }

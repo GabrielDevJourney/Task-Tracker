@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create.user.dto';
 import { UserMapper } from 'src/users/user.mapper';
 import { UserRepository } from 'src/users/user.repository';
@@ -44,6 +45,14 @@ export class UserService {
       throw new Error('User not found');
     }
     return this.userMapper.toResponseDto(user);
+  }
+
+  async findUserByEmailForAuth(email: string): Promise<UserDocument> {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
