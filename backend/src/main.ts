@@ -1,6 +1,6 @@
 // main.ts
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { CustomResponseInterceptor } from './common/interceptors/CustomResponseInterceptor';
@@ -20,6 +20,10 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => {
+        console.error('Validation errors:', errors);
+        return new BadRequestException(errors);
+      },
     }),
   );
 
