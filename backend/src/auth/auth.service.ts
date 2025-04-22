@@ -3,39 +3,52 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from 'src/users/schemas/user.schema';
+import { JwtService } from '@nestjs/jwt';
+import { UserDocument } from 'src/users/schemas/user.schema';
 import { LoginUserDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { UserMapper } from 'src/users/user.mapper';
-import { UserRepository } from 'src/users/user.repository';
 import { CreateUserDto } from 'src/users/dto/create.user.dto';
+import { UserService } from 'src/users/users.service';
+import { UserResponseDto } from 'src/users/dto/user.response.dto';
+import { UserLoginResponseDto } from 'src/users/dto/user.login.response';
+
 @Injectable()
 export class AuthService {
   constructor(
+    private userService: UserService,
     private userMapper: UserMapper,
-    private userRepository: UserRepository,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async register(createUserDto: CreateUserDto): Promise<User> {
-    const userData = this.userMapper.toEntity(createUserDto);
-    return this.userRepository.register(userData);
-  }
-  async login(loginUserDto: LoginUserDto): Promise<User> {
-    const user = await this.userRepository.findByEmail(loginUserDto.email);
-
+  async validateUser(email: string, password: string): Promise<UserDocument> {
+    const user = await this.userService.findUserByEmailForAuth(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isMatch = bcrypt.compareSync(password, user.password);
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Wrong credentials');
+    }
+    return user;
+  }
+
+  async register(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    return this.userService.createUser(createUserDto);
+  }
+
+  async login(loginUserDto: LoginUserDto): Promise<UserLoginResponseDto> {
+    const user = await this.validateUser(
+      loginUserDto.email,
       loginUserDto.password,
-      user.password,
     );
 
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    const payload = { id: user._id.toString(), email: user.email };
 
-    return user;
+    const access_token = this.jwtService.sign(payload);
+
+    return this.userMapper.toLoginResponseDto(user, access_token);
   }
 }
