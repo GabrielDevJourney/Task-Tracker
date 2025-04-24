@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
@@ -16,6 +17,9 @@ import { CreateTaskDto } from './dto/create.task.dto';
 import { UpdateTaskDto } from './dto/update.task.dto';
 import { TaskMapper } from './task.mapper';
 import { PaginationDto } from './dto/pagination.task.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/common/roles.enum';
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -26,6 +30,8 @@ export class TasksController {
   ) {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Get all tasks' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -36,6 +42,7 @@ export class TasksController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get a task by ID' })
   @ApiParam({ name: 'id', description: 'Task ID' })
   @ApiResponse({
@@ -53,6 +60,7 @@ export class TasksController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new task' })
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'The task has been successfully created.',
@@ -64,6 +72,7 @@ export class TasksController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a task' })
+  @UseGuards(JwtAuthGuard)
   @ApiParam({ name: 'id', description: 'Task ID' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -79,6 +88,7 @@ export class TasksController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Delete a task' })
   @ApiParam({ name: 'id', description: 'Task ID' })
   @ApiResponse({
