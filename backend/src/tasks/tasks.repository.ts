@@ -1,12 +1,45 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Task, TaskDocument } from './schemas/task.schema';
 import { PaginationDto } from './dto/pagination.task.dto';
+import { SimpleTaskFilter } from './tasks.service';
 
 @Injectable()
 export class TaskRepository {
   constructor(@InjectModel(Task.name) private taskModel: Model<TaskDocument>) {}
+
+  async findAllById(
+    userId: string,
+    paginationDto: PaginationDto,
+  ): Promise<TaskDocument[]> {
+    const {
+      limit = 10,
+      offset = 0,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = paginationDto;
+
+    const filter = this.buildFilter(paginationDto);
+    filter.user = new Types.ObjectId(userId);
+
+    const sort: Record<string, 1 | -1> = {};
+
+    if (sortBy) {
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    }
+
+    return (
+      this.taskModel
+        .find(filter)
+        .sort(sort)
+        .skip(offset)
+        .limit(limit)
+        //skips hydration to full moongose docs faster and cleaner js readonly returns
+        .lean()
+        .exec()
+    );
+  }
 
   async findAll(paginationDto: PaginationDto): Promise<TaskDocument[]> {
     const {
@@ -29,6 +62,10 @@ export class TaskRepository {
       .skip(offset)
       .limit(limit)
       .exec();
+  }
+
+  async findOne(filter: SimpleTaskFilter) {
+    return this.taskModel.findOne(filter).exec();
   }
 
   async findById(id: string): Promise<TaskDocument | null> {
