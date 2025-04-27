@@ -46,7 +46,6 @@ export class AuthService {
     );
 
     const payload = { id: user._id.toString(), email: user.email };
-
     const access_token = this.jwtService.sign(payload);
 
     return this.userMapper.toLoginResponseDto(user, access_token);
