@@ -3,15 +3,17 @@ import { Task, TaskDocument } from './schemas/task.schema';
 import { TaskDto } from './dto/task.dto';
 import { CreateTaskDto } from './dto/create.task.dto';
 import { UpdateTaskDto } from './dto/update.task.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class TaskMapper {
-  toEntity(createTaskDto: CreateTaskDto): Partial<Task> {
+  toEntity(createTaskDto: CreateTaskDto, userId: string): Partial<Task> {
     return {
       title: createTaskDto.title,
       description: createTaskDto.description,
       completed: createTaskDto.completed ?? false,
       dueDate: new Date(createTaskDto.dueDate),
+      user: new Types.ObjectId(userId),
     };
   }
 
